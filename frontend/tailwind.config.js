@@ -1,0 +1,50 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  darkMode: "class",
+  content: ["./app/**/*.{js,ts,jsx,tsx,mdx}", "./components/**/*.{js,ts,jsx,tsx,mdx}"],
+  theme: {
+    extend: {
+      colors: {
+        bg: "var(--bg)",
+        surface: "var(--surface)",
+        "surface-alt": "var(--surface-alt)",
+        "surface-glass": "var(--surface-glass)",
+        border: "var(--border)",
+        accent: "var(--accent)",
+        "accent-soft": "var(--accent-soft)",
+        "text-1": "var(--text-1)",
+        "text-2": "var(--text-2)",
+        "text-3": "var(--text-3)",
+        success: "var(--success)",
+        "success-soft": "var(--success-soft)",
+        danger: "var(--danger)",
+        "danger-soft": "var(--danger-soft)",
+        warning: "var(--warning)",
+        "warning-soft": "var(--warning-soft)",
+        "sidebar-bg": "var(--sidebar-bg)",
+        "sidebar-bg-2": "var(--sidebar-bg-2)",
+        "sidebar-border": "var(--sidebar-border)",
+        "sidebar-text": "var(--sidebar-text)",
+        "sidebar-text-active": "var(--sidebar-text-active)",
+        "sidebar-hover": "var(--sidebar-hover-bg)",
+        "sidebar-active": "var(--sidebar-active-bg)",
+        "sidebar-accent": "var(--sidebar-accent)",
+      },
+      borderRadius: {
+        xl: "var(--radius-xl)",
+        lg: "var(--radius-lg)",
+        DEFAULT: "var(--radius)",
+        sm: "var(--radius-sm)",
+      },
+      boxShadow: {
+        sm: "var(--shadow-sm)",
+        soft: "var(--shadow-soft)",
+        lg: "var(--shadow-lg)",
+      },
+      fontFamily: {
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+      },
+    },
+  },
+  plugins: [],
+};

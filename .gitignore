@@ -1,0 +1,24 @@
+kpi_project_docs.zip
+kpi_project/
+
+# Env
+.env
+
+# Backend
+__pycache__/
+*.pyc
+.venv/
+
+# Frontend
+node_modules/
+.next/
+
+# Backups
+backups/
+ops/backup.log
+
+# TLS certs (production secrets)
+nginx/certs/
+
+# HEMIS OAuth reference spec (not project source, may contain internal details)
+hemis_auth/
