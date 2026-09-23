@@ -801,5 +801,34 @@
     "passwordMismatch": "Passwords do not match",
     "passwordTooShort": "Password must be at least 8 characters",
     "genericError": "Something went wrong"
+  },
+  "home": {
+    "nav": {
+      "login": "Sign in"
+    },
+    "hero": {
+      "eyebrow": "International Innovation University",
+      "title": "Evidence-based, transparent evaluation of academic staff performance",
+      "subtitle": "Nizom-based indicators, staged approval, and a real-time leaderboard — all in one system.",
+      "cta": "Sign in",
+      "ctaSecondary": "View leaderboard"
+    },
+    "stats": {
+      "employees": "Participants",
+      "departments": "Faculties & departments",
+      "averageScore": "Average score",
+      "topScore": "Top score",
+      "period": "{year} academic year"
+    },
+    "leaderboard": {
+      "heading": "Leaderboard",
+      "subtitle": "Top-performing staff for the current academic year",
+      "empty": "No scored results yet",
+      "of": "of"
+    },
+    "footer": {
+      "rights": "All rights reserved",
+      "internal": "Internal KPI evaluation system"
+    }
   }
 }

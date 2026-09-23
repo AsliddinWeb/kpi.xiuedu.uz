@@ -801,5 +801,34 @@
     "passwordMismatch": "Parollar mos kelmadi",
     "passwordTooShort": "Parol kamida 8 belgidan iborat bo'lishi kerak",
     "genericError": "Xatolik yuz berdi"
+  },
+  "home": {
+    "nav": {
+      "login": "Tizimga kirish"
+    },
+    "hero": {
+      "eyebrow": "Xalqaro Innovatsion Universiteti",
+      "title": "Professor-o'qituvchilar faoliyatini dalil asosida, ochiq va adolatli baholash",
+      "subtitle": "Nizomga asoslangan ko'rsatkichlar, bosqichma-bosqich tasdiqlash va real vaqtdagi reyting — barchasi bitta tizimda.",
+      "cta": "Tizimga kirish",
+      "ctaSecondary": "Reytingni ko'rish"
+    },
+    "stats": {
+      "employees": "Ishtirokchilar",
+      "departments": "Fakultet va bo'limlar",
+      "averageScore": "O'rtacha ball",
+      "topScore": "Eng yuqori ball",
+      "period": "{year} o'quv yili"
+    },
+    "leaderboard": {
+      "heading": "Yetakchilar reytingi",
+      "subtitle": "Joriy o'quv yili bo'yicha eng yuqori natijali xodimlar",
+      "empty": "Hozircha baholangan natijalar yo'q",
+      "of": "dan"
+    },
+    "footer": {
+      "rights": "Barcha huquqlar himoyalangan",
+      "internal": "Ichki KPI baholash tizimi"
+    }
   }
 }
