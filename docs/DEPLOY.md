@@ -78,13 +78,22 @@ tushiradi.
 
 ## 5. Keyingi deploy'larda migratsiya
 
-Bazada allaqachon jadvallar bo'lgani uchun oddiyroq: avval yangi kodni
-qurib/ishga tushiring, keyin migratsiyani qo'llang:
+Bazada allaqachon jadvallar bo'lgani uchun jarayon soddaroq, lekin tartib
+muhim: **avval migratsiyani qo'llang, keyin yangi kodni ishga tushiring** —
+aks holda yangi kod eski (hali migratsiya qilinmagan) sxema bilan bir necha
+soniya ishlab, xato berishi mumkin.
 
 ```bash
+git pull
+docker compose -f docker-compose.prod.yml build backend
+docker compose -f docker-compose.prod.yml run --rm backend alembic upgrade head
 docker compose -f docker-compose.prod.yml up -d --build
-docker compose -f docker-compose.prod.yml exec backend alembic upgrade head
 ```
+
+`up -d --build` oxirida ham qo'yilgan — u `backend`dan tashqari
+`worker`/`frontend`/`nginx`ni ham yangi kod bilan qayta quradi va ishga
+tushiradi (`backend` xizmati o'zi allaqachon yangi image bilan ishlamoqda,
+`build backend` bosqichida qurilgan).
 
 ## 6. Tekshirish
 
@@ -130,11 +139,30 @@ Tiklash uchun: `./ops/restore.sh backups/<fayl>.sql.gz`
 
 ## 9. Yangilash (keyingi deploy'lar)
 
+Kodda o'zgarish bo'lganda (yangi funksiya, bug-fix, migratsiya) har safar shu
+ketma-ketlikda bajaring — tartib muhim, **avval migratsiya, keyin qayta
+qurish** (bo'lim 5dagi bilan bir xil, ushbu bo'lim tezkor eslatma sifatida):
+
 ```bash
+cd ~/xiu/kpi.xiuedu.uz
 git pull
+docker compose -f docker-compose.prod.yml build backend
+docker compose -f docker-compose.prod.yml run --rm backend alembic upgrade head
 docker compose -f docker-compose.prod.yml up -d --build
-docker compose -f docker-compose.prod.yml exec backend alembic upgrade head
 ```
+
+Tekshirish (barcha konteynerlar sog'lom holatda ishga tushganini ko'rish):
+
+```bash
+docker compose -f docker-compose.prod.yml ps
+curl -s http://localhost:6100/health
+```
+
+**Eslatma**: agar faqat migratsiya faylida (`backend/alembic/versions/`)
+xatolik topilib, kodning boshqa joyi o'zgarmagan bo'lsa ham, baribir yuqoridagi
+to'liq ketma-ketlikni bajaring — `build backend` qadami hech qachon
+o'tkazib yuborilmasin, aks holda `run --rm backend alembic ...` eski
+(git pull'dan oldingi) image bilan ishlaydi.
 
 ## 10. Xavfsizlik bo'yicha eslatmalar
 
