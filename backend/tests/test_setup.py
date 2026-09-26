@@ -126,6 +126,39 @@ def test_company_patch_updates_fields(client, seed_users):
     assert resp.json()["name"] == "Original Name"
 
 
+def test_setup_logo_upload_works_before_company_exists(client, seed_users, tmp_path, monkeypatch):
+    """The wizard's logo step runs before /setup/complete, so before any
+    CompanySettings row exists - /setup/logo must not depend on one."""
+    monkeypatch.setattr(setup_api, "LOGO_DIR", tmp_path / "company-logo")
+
+    _login(client, "superadmin@test.com")
+    status_before = client.get("/api/v1/setup/status")
+    assert status_before.json() == {"setup_completed": False}
+
+    payload = b"\x89PNG\r\n\x1a\n wizard-time upload, no company row yet"
+    upload = client.post(
+        "/api/v1/setup/logo",
+        files={"file": ("logo.png", io.BytesIO(payload), "image/png")},
+    )
+    assert upload.status_code == 200
+    logo_url = upload.json()["logo_url"]
+    assert logo_url.startswith("/api/v1/setup/company/logo-file")
+
+    client.cookies.clear()
+    fetched = client.get("/api/v1/setup/company/logo-file")
+    assert fetched.status_code == 200
+    assert fetched.content == payload
+
+
+def test_setup_logo_requires_super_admin(client, seed_users):
+    _login(client, "admin@test.com")
+    resp = client.post(
+        "/api/v1/setup/logo",
+        files={"file": ("logo.png", io.BytesIO(b"\x89PNG fake bytes"), "image/png")},
+    )
+    assert resp.status_code == 403
+
+
 def test_logo_upload_requires_admin_or_super_admin(client, seed_users):
     _login(client, "superadmin@test.com")
     _complete_setup(client)

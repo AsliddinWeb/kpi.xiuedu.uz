@@ -9,6 +9,10 @@ class SetupStatus(BaseModel):
     setup_completed: bool
 
 
+class LogoUploadResponse(BaseModel):
+    logo_url: str
+
+
 class CompanySettingsOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

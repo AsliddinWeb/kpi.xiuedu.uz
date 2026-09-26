@@ -118,9 +118,15 @@
       "name": "Tashkilot nomi",
       "industry": "Tashkilot turi",
       "industryPlaceholder": "masalan: universitet, klinika, zavod",
-      "logo": "Logotip URL (ixtiyoriy)",
+      "logo": "Logotip",
       "namePlaceholder": "masalan: Xalqaro Innovatsiyalar Universiteti",
-      "logoPlaceholder": "https://..."
+      "logoUpload": "Rasm yuklash",
+      "logoReplace": "Almashtirish",
+      "logoRemove": "O'chirish",
+      "logoHint": "PNG, JPEG, WEBP yoki SVG, 5 MB gacha",
+      "logoInvalidType": "Faqat PNG, JPEG, WEBP yoki SVG formatidagi rasm yuklash mumkin",
+      "logoTooLarge": "Rasm hajmi 5 MB dan oshmasligi kerak",
+      "genericError": "Yuklashda xatolik yuz berdi"
     },
     "departments": {
       "heading": "Bo'limlar va lavozimlar",

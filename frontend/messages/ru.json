@@ -118,9 +118,15 @@
       "name": "Название организации",
       "industry": "Тип организации",
       "industryPlaceholder": "например: университет, клиника, завод",
-      "logo": "URL логотипа (необязательно)",
+      "logo": "Логотип",
       "namePlaceholder": "например: Международный университет инноваций",
-      "logoPlaceholder": "https://..."
+      "logoUpload": "Загрузить изображение",
+      "logoReplace": "Заменить",
+      "logoRemove": "Удалить",
+      "logoHint": "PNG, JPEG, WEBP или SVG, до 5 МБ",
+      "logoInvalidType": "Можно загрузить только изображение в формате PNG, JPEG, WEBP или SVG",
+      "logoTooLarge": "Размер изображения не должен превышать 5 МБ",
+      "genericError": "Ошибка при загрузке"
     },
     "departments": {
       "heading": "Отделы и должности",

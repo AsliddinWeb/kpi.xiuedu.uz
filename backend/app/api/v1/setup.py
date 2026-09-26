@@ -17,6 +17,7 @@ from app.models.user import User, UserRole
 from app.schemas.setup import (
     CompanySettingsOut,
     CompanySettingsUpdate,
+    LogoUploadResponse,
     SetupCompleteRequest,
     SetupCompleteResponse,
     SetupStatus,
@@ -126,14 +127,8 @@ def update_company(
     return CompanySettingsOut.model_validate(company)
 
 
-@router.post("/company/logo", response_model=CompanySettingsOut)
-async def upload_company_logo(
-    request: Request,
-    file: UploadFile = File(...),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(require_role("super_admin", "admin")),
-) -> CompanySettingsOut:
-    locale = get_locale(request)
+async def _write_logo_file(file: UploadFile, locale: str) -> str:
+    """Validates and writes the uploaded logo to LOGO_DIR, returning the URL to serve it from."""
     extension = LOGO_CONTENT_TYPES.get(file.content_type or "")
     if extension is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=t("logo_invalid_type", locale))
@@ -142,16 +137,43 @@ async def upload_company_logo(
     if len(data) > MAX_LOGO_SIZE:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=t("logo_too_large", locale))
 
-    company = db.scalar(select(CompanySettings))
-    if company is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-
     LOGO_DIR.mkdir(parents=True, exist_ok=True)
     for stale in LOGO_DIR.glob("logo.*"):
         stale.unlink(missing_ok=True)
     (LOGO_DIR / f"logo.{extension}").write_bytes(data)
 
-    company.logo_url = f"/api/v1/setup/company/logo-file?v={int(datetime.now(timezone.utc).timestamp())}"
+    return f"/api/v1/setup/company/logo-file?v={int(datetime.now(timezone.utc).timestamp())}"
+
+
+@router.post("/logo", response_model=LogoUploadResponse)
+async def upload_setup_logo(
+    request: Request,
+    file: UploadFile = File(...),
+    current_user: User = Depends(require_role("super_admin")),
+) -> LogoUploadResponse:
+    """Logo upload for the setup wizard, run before a CompanySettings row exists yet
+    (it's only created when /setup/complete runs). Writes straight to disk and hands
+    back the URL for the wizard to carry in its local state and submit as
+    `logo_url` in the final /setup/complete payload - same storage/serving path as
+    the post-setup Settings-page upload, just without requiring the row upfront."""
+    locale = get_locale(request)
+    logo_url = await _write_logo_file(file, locale)
+    return LogoUploadResponse(logo_url=logo_url)
+
+
+@router.post("/company/logo", response_model=CompanySettingsOut)
+async def upload_company_logo(
+    request: Request,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("super_admin", "admin")),
+) -> CompanySettingsOut:
+    locale = get_locale(request)
+    company = db.scalar(select(CompanySettings))
+    if company is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    company.logo_url = await _write_logo_file(file, locale)
 
     log_action(db, current_user.id, "update", "company_settings", company.id)
     db.commit()

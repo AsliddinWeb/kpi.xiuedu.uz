@@ -118,9 +118,15 @@
       "name": "Organization name",
       "industry": "Organization type",
       "industryPlaceholder": "e.g. university, clinic, factory",
-      "logo": "Logo URL (optional)",
+      "logo": "Logo",
       "namePlaceholder": "e.g. International Innovation University",
-      "logoPlaceholder": "https://..."
+      "logoUpload": "Upload image",
+      "logoReplace": "Replace",
+      "logoRemove": "Remove",
+      "logoHint": "PNG, JPEG, WEBP, or SVG, up to 5 MB",
+      "logoInvalidType": "Only PNG, JPEG, WEBP, or SVG image files can be uploaded",
+      "logoTooLarge": "Image size must not exceed 5 MB",
+      "genericError": "Something went wrong while uploading"
     },
     "departments": {
       "heading": "Departments and positions",
