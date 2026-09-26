@@ -1,6 +1,7 @@
 import { IconArrowRight, IconChartBar, IconFileUpload, IconShieldCheck } from "@tabler/icons-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import AnimatedNumber from "@/components/home/AnimatedNumber";
 import ScrollReveal from "@/components/home/ScrollReveal";
 import TopRightControls from "@/components/TopRightControls";
 import type { CompanySettings } from "@/lib/company";
@@ -82,10 +83,10 @@ export default async function PublicHome({
             <div className="animate-fade-up mt-8 flex flex-wrap items-center gap-3" style={{ animationDelay: "140ms" }}>
               <Link
                 href="/login"
-                className="flex items-center gap-1.5 rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_14px_-2px_rgba(76,95,238,0.45)] transition-all hover:-translate-y-0.5 hover:bg-[#3646c9] hover:shadow-lg"
+                className="group flex items-center gap-1.5 rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_14px_-2px_rgba(76,95,238,0.45)] transition-all hover:-translate-y-0.5 hover:bg-[#3646c9] hover:shadow-lg"
               >
                 {t("hero.ctaPrimary")}
-                <IconArrowRight size={16} stroke={2} />
+                <IconArrowRight size={16} stroke={2} className="transition-transform duration-200 group-hover:translate-x-0.5" />
               </Link>
               <a
                 href="#leaderboard"
@@ -97,27 +98,58 @@ export default async function PublicHome({
           </div>
 
           <div className="animate-fade-up" style={{ animationDelay: "100ms" }}>
-            <div className="rounded-2xl border border-border bg-surface p-5 shadow-lg">
-              <p className="text-xs font-medium text-text-3">{t("hero.previewLabel")}</p>
-              {topThree.length === 0 ? (
-                <p className="mt-6 py-4 text-center text-sm text-text-3">{t("hero.previewEmpty")}</p>
-              ) : (
-                <div className="mt-4 space-y-1">
-                  {topThree.map((row, i) => (
-                    <div key={`${row.full_name}-${i}`} className="flex items-center gap-3 rounded-lg px-1 py-2.5">
-                      <span
-                        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-                          i === 0 ? "bg-accent text-white" : "bg-accent-soft text-accent"
-                        }`}
-                      >
-                        {i + 1}
-                      </span>
-                      <span className="min-w-0 flex-1 truncate text-sm font-medium text-text-1">{row.full_name}</span>
-                      <span className="shrink-0 text-sm font-bold tabular-nums text-text-1">{row.total_score}</span>
-                    </div>
-                  ))}
+            <div className="relative">
+              {/* Stacked ghost cards behind the live preview - hints that this is a
+                  slice of a longer, real ranking (the full list is below the fold). */}
+              <div
+                aria-hidden
+                className="absolute inset-x-3 -top-3 h-full rounded-2xl border border-border bg-surface/70 opacity-60"
+                style={{ transform: "rotate(-1.5deg)" }}
+              />
+              <div
+                aria-hidden
+                className="absolute inset-x-1.5 -top-1.5 h-full rounded-2xl border border-border bg-surface/85 opacity-80"
+                style={{ transform: "rotate(0.8deg)" }}
+              />
+
+              <div className="relative rounded-2xl border border-border bg-surface p-5 shadow-lg">
+                <div className="flex items-center gap-1.5">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75 motion-reduce:hidden" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
+                  </span>
+                  <p className="text-xs font-medium text-text-3">{t("hero.previewLabel")}</p>
                 </div>
-              )}
+
+                {topThree.length === 0 ? (
+                  <p className="mt-6 py-4 text-center text-sm text-text-3">{t("hero.previewEmpty")}</p>
+                ) : (
+                  <div className="mt-4 space-y-1">
+                    {topThree.map((row, i) => (
+                      <div
+                        key={`${row.full_name}-${i}`}
+                        className="animate-slide-in flex items-center gap-3 rounded-lg px-1 py-2.5 transition-colors hover:bg-surface-alt"
+                        style={{ animationDelay: `${220 + i * 90}ms` }}
+                      >
+                        <span className="relative flex h-7 w-7 shrink-0 items-center justify-center">
+                          {i === 0 && <span aria-hidden className="animate-pulse-ring absolute inset-0 rounded-full" />}
+                          <span
+                            className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
+                              i === 0 ? "bg-accent text-white" : "bg-accent-soft text-accent"
+                            }`}
+                          >
+                            {i + 1}
+                          </span>
+                        </span>
+                        <span className="min-w-0 flex-1 truncate text-sm font-medium text-text-1">{row.full_name}</span>
+                        <span className="shrink-0 text-sm font-bold tabular-nums text-text-1">
+                          <AnimatedNumber value={row.total_score} durationMs={900} />
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </section>
@@ -125,10 +157,10 @@ export default async function PublicHome({
 
       <ScrollReveal className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="grid grid-cols-2 divide-x divide-y divide-border border-y border-border sm:grid-cols-4 sm:divide-y-0">
-          <StatCell label={t("stats.employees")} value={stats ? String(stats.total_employees) : "0"} />
-          <StatCell label={t("stats.departments")} value={stats ? String(stats.total_departments) : "0"} />
-          <StatCell label={t("stats.average")} value={stats?.average_score != null ? String(stats.average_score) : "-"} />
-          <StatCell label={t("stats.top")} value={stats?.top_score != null ? String(stats.top_score) : "-"} />
+          <StatCell label={t("stats.employees")} value={stats?.total_employees ?? 0} />
+          <StatCell label={t("stats.departments")} value={stats?.total_departments ?? 0} />
+          <StatCell label={t("stats.average")} value={stats?.average_score ?? null} />
+          <StatCell label={t("stats.top")} value={stats?.top_score ?? null} />
         </div>
       </ScrollReveal>
 
@@ -211,10 +243,12 @@ export default async function PublicHome({
   );
 }
 
-function StatCell({ label, value }: { label: string; value: string }) {
+function StatCell({ label, value }: { label: string; value: number | null }) {
   return (
     <div className="flex flex-col gap-1 px-3 py-6 sm:px-6">
-      <p className="text-3xl font-bold tracking-tight text-text-1 tabular-nums">{value}</p>
+      <p className="text-3xl font-bold tracking-tight text-text-1 tabular-nums">
+        {value != null ? <AnimatedNumber value={value} /> : "-"}
+      </p>
       <p className="text-xs text-text-3">{label}</p>
     </div>
   );
