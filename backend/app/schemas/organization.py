@@ -23,6 +23,11 @@ class PositionOut(BaseModel):
     title: str
     bonus_fund: float | None
     minimal_score: float | None
+    # Set (to the parent department's id) when this row is included in a child
+    # department's position list only because it was created on its parent
+    # faculty and inherited down - None when the position belongs to the
+    # department it's listed under.
+    inherited_from_department_id: int | None = None
 
 
 class DepartmentCreate(BaseModel):

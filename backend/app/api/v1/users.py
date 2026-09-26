@@ -1,5 +1,6 @@
 import io
 import secrets
+from datetime import datetime, timezone
 
 import openpyxl
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status
@@ -24,6 +25,7 @@ from app.schemas.employee import (
     ImportSummary,
     RestrictRequest,
 )
+from app.services import hemis_rest
 from app.services.audit import log_action
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -386,6 +388,41 @@ def get_employee(
     is_own_report = current_user.role == UserRole.manager and user.manager_id == current_user.id
     if not (is_self or is_admin or is_own_report):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=t("not_enough_permissions", locale))
+    return UserOut.model_validate(user)
+
+
+@router.post("/{user_id}/hemis-sync", response_model=UserOut)
+def sync_employee_from_hemis(
+    user_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("super_admin", "admin")),
+) -> UserOut:
+    """Pulls fresh data for this one employee from HEMIS's server-side REST
+    directory (separate token from the OAuth login flow - see
+    app/services/hemis_rest.py). Works for any employee with a known
+    `hemis_employee_id_number`, regardless of whether they've logged in via
+    HEMIS themselves recently."""
+    locale = get_locale(request)
+    user = db.get(User, user_id)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=t("user_not_found", locale))
+    if not user.hemis_employee_id_number:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=t("hemis_sync_no_identifier", locale))
+
+    try:
+        meta = hemis_rest.fetch_employee_by_id_number(user.hemis_employee_id_number)
+    except hemis_rest.HemisRestError as exc:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+    if meta is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=t("hemis_sync_not_found", locale))
+
+    hemis_rest.apply_employee_meta(user, meta)
+    user.hemis_rest_synced_at = datetime.now(timezone.utc)
+
+    log_action(db, current_user.id, "hemis_sync", "user", user.id)
+    db.commit()
+    db.refresh(user)
     return UserOut.model_validate(user)
 
 

@@ -244,7 +244,11 @@
     "kafedrasSection": "Standalone departments",
     "administrativeSection": "Administrative units",
     "kafedraNoParentHint": "A kafedra usually belongs to a faculty — don't forget to pick a faculty as the parent department",
-    "basicInfo": "Basic information"
+    "basicInfo": "Basic information",
+    "addPosition": "Add position",
+    "editPosition": "Edit position",
+    "positionTitleLabel": "Position title",
+    "inherited": "From faculty"
   },
   "employees": {
     "heading": "Employees",
@@ -346,7 +350,26 @@
     "resultStatus": {
       "computed": "Computed",
       "approved": "Approved"
-    }
+    },
+    "edit": "Edit",
+    "lastLogin": "Last login",
+    "never": "Never",
+    "hemisInfo": "HEMIS information",
+    "hemisLogin": "HEMIS login",
+    "hemisPhone": "Phone",
+    "hemisType": "Type",
+    "hemisBirthDate": "Date of birth",
+    "hemisAcademicRank": "Academic rank (HEMIS)",
+    "hemisStaffPosition": "Position (HEMIS)",
+    "hemisEmploymentStatus": "Employment status",
+    "hemisDepartment": "Department (HEMIS)",
+    "hemisOAuthSynced": "Updated via HEMIS login",
+    "hemisRestSynced": "Manually synced",
+    "notSyncedYet": "Not synced yet",
+    "syncNow": "Sync now",
+    "syncing": "Syncing...",
+    "noHemisLink": "This employee is not linked to HEMIS",
+    "genericError": "Something went wrong"
   },
   "templates": {
     "heading": "KPI templates",

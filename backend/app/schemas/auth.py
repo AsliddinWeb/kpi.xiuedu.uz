@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
@@ -26,6 +27,25 @@ class UserOut(BaseModel):
     is_restricted: bool
     theme_preference: str
     sidebar_collapsed: bool
+    last_login_at: datetime | None
+
+    # HEMIS OAuth (per-login sync)
+    hemis_login: str | None
+    hemis_phone: str | None
+    hemis_type: str | None
+    hemis_birth_date: date | None
+    hemis_picture_url: str | None
+    hemis_last_synced_at: datetime | None
+
+    # HEMIS REST API (admin-triggered resync) - see app/services/hemis_rest.py
+    hemis_employee_id_number: str | None
+    hemis_image_url: str | None
+    hemis_academic_degree_name: str | None
+    hemis_academic_rank_name: str | None
+    hemis_staff_position_name: str | None
+    hemis_employment_status_name: str | None
+    hemis_department_name: str | None
+    hemis_rest_synced_at: datetime | None
 
 
 class LoginResponse(BaseModel):

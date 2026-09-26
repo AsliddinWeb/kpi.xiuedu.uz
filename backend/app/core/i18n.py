@@ -69,6 +69,16 @@ MESSAGES: dict[str, dict[str, str]] = {
         "ru": "Логотип не найден",
         "en": "Logo not found",
     },
+    "hemis_sync_no_identifier": {
+        "uz": "Bu xodim HEMIS bilan bog'lanmagan (employee_id_number yo'q) - sinxronlash mumkin emas",
+        "ru": "Этот сотрудник не связан с HEMIS (нет employee_id_number) - синхронизация невозможна",
+        "en": "This employee has no HEMIS link (no employee_id_number) - cannot sync",
+    },
+    "hemis_sync_not_found": {
+        "uz": "HEMIS'da bu employee_id_number bo'yicha xodim topilmadi",
+        "ru": "Сотрудник с этим employee_id_number не найден в HEMIS",
+        "en": "No employee found in HEMIS for this employee_id_number",
+    },
     "department_not_found": {
         "uz": "Bo'lim topilmadi",
         "ru": "Отдел не найден",

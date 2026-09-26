@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  IconAlertTriangle,
   IconBriefcase,
   IconBuilding,
   IconCalendar,
@@ -8,21 +9,31 @@ import {
   IconCircleCheck,
   IconCircleX,
   IconClock,
+  IconClockHour4,
   IconFolderOpen,
   IconGauge,
+  IconId,
+  IconLoader2,
+  IconLogin2,
   IconMail,
+  IconPencil,
+  IconPhone,
+  IconRefresh,
+  IconSchool,
   IconShieldCheck,
   IconStack3,
   IconUserCheck,
   IconUsersGroup,
 } from "@tabler/icons-react";
 import { useLocale, useTranslations } from "next-intl";
+import Link from "next/link";
 import { useState } from "react";
 import type { Department, Position } from "@/lib/departments";
 import type { MyKpiIndicatorRow } from "@/lib/dashboard";
 import type { Employee } from "@/lib/employees";
 import type { KpiResult } from "@/lib/kpiResults";
 import type { KpiTemplate } from "@/lib/kpiTemplates";
+import TimeAgo from "@/components/ui/TimeAgo";
 
 const STATUS_META: Record<string, { icon: typeof IconClock; tone: string }> = {
   submitted: { icon: IconClock, tone: "bg-warning-soft text-warning" },
@@ -42,6 +53,7 @@ export default function EmployeeDetailView({
   defaultPeriod,
   initialKpiResults,
   initialRows,
+  viewerRole,
 }: {
   employee: Employee;
   department: Department | null;
@@ -51,6 +63,7 @@ export default function EmployeeDetailView({
   defaultPeriod: string | null;
   initialKpiResults: KpiResult[];
   initialRows: MyKpiIndicatorRow[];
+  viewerRole: string;
 }) {
   const locale = useLocale();
   const t = useTranslations("employeeDetail");
@@ -60,6 +73,14 @@ export default function EmployeeDetailView({
   const [period, setPeriod] = useState(defaultPeriod ?? "");
   const [rows, setRows] = useState(initialRows);
   const [loading, setLoading] = useState(false);
+
+  const [hemis, setHemis] = useState(employee);
+  const [syncing, setSyncing] = useState(false);
+  const [syncError, setSyncError] = useState<string | null>(null);
+
+  const canEdit = viewerRole === "super_admin" || viewerRole === "admin";
+  const photoUrl = hemis.hemis_image_url || hemis.hemis_picture_url;
+  const hasHemisLink = hemis.auth_provider === "hemis" || Boolean(hemis.hemis_employee_id_number);
 
   const currentResult = initialKpiResults.find((r) => r.period === period) ?? null;
 
@@ -90,12 +111,39 @@ export default function EmployeeDetailView({
     }
   }
 
+  async function handleSync() {
+    setSyncing(true);
+    setSyncError(null);
+    try {
+      const res = await fetch(`/api/v1/users/${employee.id}/hemis-sync`, {
+        method: "POST",
+        headers: { "Accept-Language": locale },
+        credentials: "include",
+      });
+      const body = await res.json().catch(() => null);
+      if (!res.ok) {
+        setSyncError(body?.detail ?? t("genericError"));
+        return;
+      }
+      setHemis(body);
+    } finally {
+      setSyncing(false);
+    }
+  }
+
   return (
     <div className="space-y-5">
       <div className="rounded-xl border border-border bg-surface p-5 shadow-soft">
         <div className="flex flex-wrap items-start gap-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-xl font-bold text-accent">
-            {employee.full_name.charAt(0).toUpperCase()}
+          <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-accent-soft">
+            {photoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={photoUrl} alt={employee.full_name} className="h-full w-full object-cover" />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-xl font-bold text-accent">
+                {employee.full_name.charAt(0).toUpperCase()}
+              </div>
+            )}
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-lg font-semibold text-text-1">{employee.full_name}</p>
@@ -103,28 +151,107 @@ export default function EmployeeDetailView({
               {roleT(employee.role)}
             </span>
           </div>
-          <div
-            className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-              employee.is_active ? "bg-success-soft text-success" : "bg-danger-soft text-danger"
-            }`}
-          >
-            {employee.is_active ? t("active") : t("inactive")}
+          <div className="flex shrink-0 items-center gap-2">
+            <div
+              className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                employee.is_active ? "bg-success-soft text-success" : "bg-danger-soft text-danger"
+              }`}
+            >
+              {employee.is_active ? t("active") : t("inactive")}
+            </div>
+            {canEdit && (
+              <Link
+                href={`/dashboard/employees/${employee.id}/edit`}
+                className="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:brightness-90"
+              >
+                <IconPencil size={13} stroke={2} />
+                {t("edit")}
+              </Link>
+            )}
           </div>
         </div>
 
         <div className="mt-4 grid gap-3 border-t border-border pt-4 sm:grid-cols-2 lg:grid-cols-3">
           <InfoItem icon={IconMail} label={t("email")} value={employee.email} />
           <InfoItem icon={IconCertificate} label={t("academicDegree")} value={degreeT(employee.academic_degree)} />
-          <InfoItem icon={IconBuilding} label={t("department")} value={department?.name ?? "—"} />
-          <InfoItem icon={IconBriefcase} label={t("position")} value={position?.title ?? "—"} />
-          <InfoItem icon={IconUsersGroup} label={t("manager")} value={managerName ?? "—"} />
+          <InfoItem icon={IconBuilding} label={t("department")} value={department?.name ?? "-"} />
+          <InfoItem icon={IconBriefcase} label={t("position")} value={position?.title ?? "-"} />
+          <InfoItem icon={IconUsersGroup} label={t("manager")} value={managerName ?? "-"} />
           <InfoItem
             icon={IconStack3}
             label={t("kpiTemplate")}
-            value={template ? `${template.annex_code}-${t("annex")}: ${template.name}` : "—"}
+            value={template ? `${template.annex_code}-${t("annex")}: ${template.name}` : "-"}
+          />
+          <InfoItem
+            icon={IconLogin2}
+            label={t("lastLogin")}
+            value={employee.last_login_at ? <TimeAgo iso={employee.last_login_at} locale={locale} /> : t("never")}
           />
         </div>
       </div>
+
+      {hasHemisLink && (
+        <div className="rounded-xl border border-border bg-surface p-5 shadow-soft">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <IconSchool size={16} stroke={1.75} className="text-text-3" />
+              <p className="text-sm font-semibold text-text-1">{t("hemisInfo")}</p>
+            </div>
+            {canEdit && (
+              <button
+                type="button"
+                onClick={handleSync}
+                disabled={syncing}
+                className="flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-text-1 transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
+              >
+                {syncing ? <IconLoader2 size={13} className="animate-spin" /> : <IconRefresh size={13} stroke={2} />}
+                {syncing ? t("syncing") : t("syncNow")}
+              </button>
+            )}
+          </div>
+
+          {syncError && (
+            <p className="mt-3 flex items-center gap-2 rounded-lg border border-danger-soft bg-danger-soft px-3 py-2.5 text-sm text-danger">
+              <IconAlertTriangle size={16} stroke={1.75} className="shrink-0" />
+              {syncError}
+            </p>
+          )}
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {hemis.hemis_login && <InfoItem icon={IconId} label={t("hemisLogin")} value={hemis.hemis_login} />}
+            {hemis.hemis_phone && <InfoItem icon={IconPhone} label={t("hemisPhone")} value={hemis.hemis_phone} />}
+            {hemis.hemis_type && <InfoItem icon={IconId} label={t("hemisType")} value={hemis.hemis_type} />}
+            {hemis.hemis_birth_date && (
+              <InfoItem icon={IconCalendar} label={t("hemisBirthDate")} value={hemis.hemis_birth_date} />
+            )}
+            {hemis.hemis_academic_rank_name && (
+              <InfoItem icon={IconCertificate} label={t("hemisAcademicRank")} value={hemis.hemis_academic_rank_name} />
+            )}
+            {hemis.hemis_staff_position_name && (
+              <InfoItem icon={IconBriefcase} label={t("hemisStaffPosition")} value={hemis.hemis_staff_position_name} />
+            )}
+            {hemis.hemis_employment_status_name && (
+              <InfoItem icon={IconShieldCheck} label={t("hemisEmploymentStatus")} value={hemis.hemis_employment_status_name} />
+            )}
+            {hemis.hemis_department_name && (
+              <InfoItem icon={IconBuilding} label={t("hemisDepartment")} value={hemis.hemis_department_name} />
+            )}
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1.5 border-t border-border pt-3 text-xs text-text-3">
+            <span className="flex items-center gap-1.5">
+              <IconClockHour4 size={12} stroke={1.75} />
+              {t("hemisOAuthSynced")}:{" "}
+              {hemis.hemis_last_synced_at ? <TimeAgo iso={hemis.hemis_last_synced_at} locale={locale} /> : t("never")}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <IconRefresh size={12} stroke={1.75} />
+              {t("hemisRestSynced")}:{" "}
+              {hemis.hemis_rest_synced_at ? <TimeAgo iso={hemis.hemis_rest_synced_at} locale={locale} /> : t("notSyncedYet")}
+            </span>
+          </div>
+        </div>
+      )}
 
       {template ? (
         <div className="rounded-xl border border-border bg-surface p-5 shadow-soft">
@@ -203,7 +330,7 @@ export default function EmployeeDetailView({
                                     }`}
                                   >
                                     {meta && <meta.icon size={11} stroke={2} />}
-                                    {sub.awarded_score ?? "—"}
+                                    {sub.awarded_score ?? "-"}
                                   </span>
                                 );
                               })}
@@ -234,7 +361,7 @@ function InfoItem({
 }: {
   icon: typeof IconMail;
   label: string;
-  value: string;
+  value: React.ReactNode;
 }) {
   return (
     <div className="flex items-center gap-2.5 rounded-lg bg-bg px-3 py-2">

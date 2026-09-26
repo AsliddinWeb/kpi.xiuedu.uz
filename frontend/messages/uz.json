@@ -244,7 +244,11 @@
     "kafedrasSection": "Mustaqil kafedralar",
     "administrativeSection": "Boshqarmalar va bo'limlar",
     "kafedraNoParentHint": "Kafedra odatda biror fakultetga tegishli bo'ladi — ota-bo'lim sifatida fakultetni tanlashni unutmang",
-    "basicInfo": "Asosiy ma'lumotlar"
+    "basicInfo": "Asosiy ma'lumotlar",
+    "addPosition": "Lavozim qo'shish",
+    "editPosition": "Lavozimni tahrirlash",
+    "positionTitleLabel": "Lavozim nomi",
+    "inherited": "Fakultetdan"
   },
   "employees": {
     "heading": "Xodimlar",
@@ -346,7 +350,26 @@
     "resultStatus": {
       "computed": "Hisoblangan",
       "approved": "Tasdiqlangan"
-    }
+    },
+    "edit": "Tahrirlash",
+    "lastLogin": "Oxirgi kirish",
+    "never": "Hech qachon",
+    "hemisInfo": "HEMIS ma'lumotlari",
+    "hemisLogin": "HEMIS login",
+    "hemisPhone": "Telefon",
+    "hemisType": "Turi",
+    "hemisBirthDate": "Tug'ilgan sana",
+    "hemisAcademicRank": "Unvon (HEMIS)",
+    "hemisStaffPosition": "Lavozim (HEMIS)",
+    "hemisEmploymentStatus": "Ish holati",
+    "hemisDepartment": "Bo'lim (HEMIS)",
+    "hemisOAuthSynced": "HEMIS orqali kirish bilan yangilangan",
+    "hemisRestSynced": "Qo'lda sinxronlangan",
+    "notSyncedYet": "Hali sinxronlanmagan",
+    "syncNow": "Sinxronlash",
+    "syncing": "Sinxronlanmoqda...",
+    "noHemisLink": "Bu xodim HEMIS bilan bog'lanmagan",
+    "genericError": "Amalni bajarishda xatolik yuz berdi"
   },
   "templates": {
     "heading": "KPI shablonlari",

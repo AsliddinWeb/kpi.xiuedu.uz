@@ -20,5 +20,10 @@ class Settings(BaseSettings):
     hemis_redirect_uri: str = ""
     frontend_base_url: str = "http://localhost:6100"
 
+    # HEMIS REST API (server-side employee directory, separate token from OAuth
+    # above - generated in the HEMIS admin panel) - see app/services/hemis_rest.py
+    hemis_rest_base_url: str = "https://student.xiuedu.uz/rest"
+    hemis_api_token: str = ""
+
 
 settings = Settings()

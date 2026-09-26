@@ -16,12 +16,23 @@ router = APIRouter(prefix="/departments", tags=["departments"])
 
 def _to_department_out(db: Session, department: Department) -> DepartmentOut:
     positions = db.scalars(select(Position).where(Position.department_id == department.id)).all()
+    position_outs = [PositionOut.model_validate(p) for p in positions]
+
+    if department.parent_department_id is not None:
+        parent_positions = db.scalars(
+            select(Position).where(Position.department_id == department.parent_department_id)
+        ).all()
+        for p in parent_positions:
+            out = PositionOut.model_validate(p)
+            out.inherited_from_department_id = p.department_id
+            position_outs.append(out)
+
     return DepartmentOut(
         id=department.id,
         name=department.name,
         department_type=department.department_type,
         parent_department_id=department.parent_department_id,
-        positions=[PositionOut.model_validate(p) for p in positions],
+        positions=position_outs,
     )
 
 
@@ -37,13 +48,22 @@ def list_departments(
     for position in positions:
         positions_by_department.setdefault(position.department_id, []).append(position)
 
+    def positions_for(d: Department) -> list[PositionOut]:
+        outs = [PositionOut.model_validate(p) for p in positions_by_department.get(d.id, [])]
+        if d.parent_department_id is not None:
+            for p in positions_by_department.get(d.parent_department_id, []):
+                out = PositionOut.model_validate(p)
+                out.inherited_from_department_id = p.department_id
+                outs.append(out)
+        return outs
+
     return [
         DepartmentOut(
             id=d.id,
             name=d.name,
             department_type=d.department_type,
             parent_department_id=d.parent_department_id,
-            positions=[PositionOut.model_validate(p) for p in positions_by_department.get(d.id, [])],
+            positions=positions_for(d),
         )
         for d in departments
     ]

@@ -7,6 +7,7 @@ export type Position = {
   title: string;
   bonus_fund: number | null;
   minimal_score: number | null;
+  inherited_from_department_id: number | null;
 };
 
 export type DepartmentType = "faculty" | "kafedra" | "administrative";

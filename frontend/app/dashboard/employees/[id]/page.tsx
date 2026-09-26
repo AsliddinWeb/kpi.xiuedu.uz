@@ -61,6 +61,7 @@ export default async function EmployeeDetailPage({ params }: { params: { id: str
         defaultPeriod={defaultPeriod}
         initialKpiResults={kpiResults}
         initialRows={myKpiRows}
+        viewerRole={viewer.role}
       />
     </div>
   );

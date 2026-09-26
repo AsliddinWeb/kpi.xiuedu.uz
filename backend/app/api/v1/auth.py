@@ -1,4 +1,5 @@
 import secrets
+from datetime import datetime, timezone
 
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
@@ -57,6 +58,7 @@ def login(payload: LoginRequest, request: Request, response: Response, db: Sessi
         REFRESH_COOKIE, refresh_token, max_age=settings.jwt_refresh_expire_days * 86400, **_cookie_kwargs()
     )
 
+    user.last_login_at = datetime.now(timezone.utc)
     log_action(db, user.id, "login", "user", user.id)
     db.commit()
 
@@ -142,6 +144,7 @@ def hemis_callback(
         db.rollback()
         return RedirectResponse(f"{login_url}?error=hemis_inactive")
 
+    user.last_login_at = datetime.now(timezone.utc)
     log_action(db, user.id, "login", "user", user.id)
     db.commit()
     db.refresh(user)

@@ -66,6 +66,7 @@ export default function EmployeeForm({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const photoUrl = employee?.hemis_image_url || employee?.hemis_picture_url || null;
   const managers = employees.filter((e) => ["manager", "admin", "super_admin"].includes(e.role) && e.id !== employee?.id);
   const selectedDepartment = departments.find((d) => String(d.id) === departmentId);
   const selectedTemplate = kpiTemplates.find((tpl) => String(tpl.id) === kpiTemplateId);
@@ -130,8 +131,15 @@ export default function EmployeeForm({
 
       <FormSection icon={IconIdBadge2} title={t("accountInfo")}>
         <div className="mb-4 flex items-center gap-3">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-lg font-bold text-accent">
-            {fullName.trim() ? fullName.trim().charAt(0).toUpperCase() : <IconUser size={20} stroke={1.75} />}
+          <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-accent-soft">
+            {photoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={photoUrl} alt={fullName || "avatar"} className="h-full w-full object-cover" />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-lg font-bold text-accent">
+                {fullName.trim() ? fullName.trim().charAt(0).toUpperCase() : <IconUser size={20} stroke={1.75} />}
+              </div>
+            )}
           </div>
           <div>
             <p className="text-sm font-semibold text-text-1">{fullName.trim() || t("fullName")}</p>

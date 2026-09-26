@@ -83,4 +83,18 @@ class User(Base):
     hemis_picture_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     hemis_last_synced_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
+    # HEMIS REST API (server-side, X-Api-Key/bearer token, /v1/data/employee-list) -
+    # a richer, separate integration from the OAuth login above. Populated only when
+    # an admin explicitly triggers a resync (see app/services/hemis_rest.py), since it
+    # does not depend on that specific employee logging in themselves.
+    hemis_image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    hemis_academic_degree_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    hemis_academic_rank_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    hemis_staff_position_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    hemis_employment_status_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    hemis_department_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    hemis_rest_synced_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
     manager: Mapped["User | None"] = relationship("User", remote_side=[id])

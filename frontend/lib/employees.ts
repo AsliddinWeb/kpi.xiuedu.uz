@@ -16,6 +16,25 @@ export type Employee = {
   is_active: boolean;
   is_restricted: boolean;
   theme_preference: string;
+  last_login_at: string | null;
+
+  // HEMIS OAuth (synced on that person's own HEMIS login)
+  hemis_login: string | null;
+  hemis_phone: string | null;
+  hemis_type: string | null;
+  hemis_birth_date: string | null;
+  hemis_picture_url: string | null;
+  hemis_last_synced_at: string | null;
+
+  // HEMIS REST API (admin-triggered resync, works without that person logging in)
+  hemis_employee_id_number: string | null;
+  hemis_image_url: string | null;
+  hemis_academic_degree_name: string | null;
+  hemis_academic_rank_name: string | null;
+  hemis_staff_position_name: string | null;
+  hemis_employment_status_name: string | null;
+  hemis_department_name: string | null;
+  hemis_rest_synced_at: string | null;
 };
 
 export type AcademicDegree = "none" | "phd" | "dsc" | "dotsent" | "professor";

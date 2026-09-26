@@ -21,6 +21,33 @@ def test_list_departments_includes_nested_positions(client, seed_users, seed_dep
     assert by_name["Finance"]["positions"] == []
 
 
+def test_kafedra_inherits_parent_faculty_positions(client, seed_users):
+    _login(client, "superadmin@test.com")
+    faculty = client.post(
+        "/api/v1/departments", json={"name": "Pedagogika fakulteti", "department_type": "faculty"}
+    ).json()
+    kafedra = client.post(
+        "/api/v1/departments",
+        json={"name": "Umumiy pedagogika kafedrasi", "department_type": "kafedra", "parent_department_id": faculty["id"]},
+    ).json()
+
+    client.post(f"/api/v1/departments/{faculty['id']}/positions", json={"title": "Dekan"})
+    kafedra_position = client.post(f"/api/v1/departments/{kafedra['id']}/positions", json={"title": "Kafedra mudiri"}).json()
+
+    detail = client.get(f"/api/v1/departments/{kafedra['id']}").json()
+    positions = {p["title"]: p for p in detail["positions"]}
+    assert set(positions.keys()) == {"Dekan", "Kafedra mudiri"}
+    assert positions["Dekan"]["inherited_from_department_id"] == faculty["id"]
+    assert positions["Kafedra mudiri"]["inherited_from_department_id"] is None
+    assert positions["Kafedra mudiri"]["id"] == kafedra_position["id"]
+
+    listing = {d["name"]: d for d in client.get("/api/v1/departments").json()}
+    listed_positions = {p["title"] for p in listing["Umumiy pedagogika kafedrasi"]["positions"]}
+    assert listed_positions == {"Dekan", "Kafedra mudiri"}
+    # the faculty's own listing must NOT also show the kafedra's position
+    assert {p["title"] for p in listing["Pedagogika fakulteti"]["positions"]} == {"Dekan"}
+
+
 def test_create_department(client, seed_users, seed_departments):
     _login(client, "superadmin@test.com")
     resp = client.post("/api/v1/departments", json={"name": "Marketing"})

@@ -45,6 +45,43 @@ HEMIS profilidan kelgan ma'lumotlar `users` jadvalidagi `hemis_*` ustunlarida sa
 
 **Muhim**: `role`, `department_id`, `position_id`, `kpi_template_id` kabi tizim ichida boshqariladigan maydonlar HEMIS tomonidan **hech qachon ustidan yozilmaydi** — ular faqat shu tizim administratorlari tomonidan (Xodimlar sahifasi orqali) boshqariladi. HEMIS faqat identifikatsiya (kim ekanligini tasdiqlash) uchun ishlatiladi.
 
+## HEMIS'dan qo'lda sinxronlash (REST API, OAuth'dan mustaqil)
+
+Yuqoridagi OAuth oqimi faqat xodimning **o'zi** HEMIS orqali kirganda ishlaydi
+— boshqa birov (masalan administrator) uning ma'lumotini "hoziroq yangila" deb
+so'ray olmaydi, chunki OAuth token faqat o'sha login jarayonida bir marta
+ishlatiladi va saqlanmaydi.
+
+Shu sabab Xodim tafsiloti sahifasida (`/dashboard/employees/{id}`) alohida
+**"Sinxronlash"** tugmasi bor — bu HEMIS'ning butunlay boshqa, server-server
+REST API'sidan (`/v1/data/employee-list`, statik Bearer token bilan)
+foydalanadi va istalgan xodim uchun, ular login qilmasa ham ishlaydi. Bu
+integratsiya `hemis_auth/openapi.json` (HEMIS'ning rasmiy OpenAPI hujjati)
+asosida qurilgan — `backend/app/services/hemis_rest.py`ga qarang.
+
+**Sozlash:**
+1. HEMIS admin panelida ("API" yoki "Token" bo'limida) yangi token generatsiya qiling.
+2. `.env` fayliga yozing:
+   ```
+   HEMIS_REST_BASE_URL=https://student.xiuedu.uz/rest
+   HEMIS_API_TOKEN=...
+   ```
+3. Konteynerlarni qayta ishga tushiring.
+
+Token sozlanmagan bo'lsa, "Sinxronlash" tugmasi bosilganda `503` xato
+ko'rsatiladi (buzilish emas). Sinxronlash faqat `hemis_employee_id_number`
+allaqachon bor xodimlar uchun ishlaydi (ya'ni kamida bir marta HEMIS orqali
+kirgan yoki import qilingan bo'lishi kerak) — bu maydon orqali HEMIS'dan aniq
+shu odam qidiriladi.
+
+Bu yo'l bilan olingan ma'lumotlar (rasm, unvon, lavozim, ish holati, bo'lim
+nomi) alohida `hemis_image_url`, `hemis_academic_degree_name`,
+`hemis_academic_rank_name`, `hemis_staff_position_name`,
+`hemis_employment_status_name`, `hemis_department_name` va
+`hemis_rest_synced_at` ustunlarida saqlanadi — yuqoridagi OAuth
+ustunlaridan (`hemis_last_synced_at` bilan yangilanadigan) alohida, chunki
+ular ikki xil, mustaqil sinxronlash mexanizmi.
+
 ## Texnik manba
 
 Bu integratsiya HEMIS'ning rasmiy namunaviy loyihasiga asoslangan: https://github.com/homidjonov/hemis-oauth

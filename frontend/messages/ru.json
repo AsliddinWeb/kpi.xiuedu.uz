@@ -244,7 +244,11 @@
     "kafedrasSection": "Самостоятельные кафедры",
     "administrativeSection": "Управления и отделы",
     "kafedraNoParentHint": "Кафедра обычно относится к какому-либо факультету — не забудьте выбрать факультет как родительский отдел",
-    "basicInfo": "Основная информация"
+    "basicInfo": "Основная информация",
+    "addPosition": "Добавить должность",
+    "editPosition": "Редактировать должность",
+    "positionTitleLabel": "Название должности",
+    "inherited": "От факультета"
   },
   "employees": {
     "heading": "Сотрудники",
@@ -346,7 +350,26 @@
     "resultStatus": {
       "computed": "Рассчитано",
       "approved": "Утверждено"
-    }
+    },
+    "edit": "Редактировать",
+    "lastLogin": "Последний вход",
+    "never": "Никогда",
+    "hemisInfo": "Данные HEMIS",
+    "hemisLogin": "Логин HEMIS",
+    "hemisPhone": "Телефон",
+    "hemisType": "Тип",
+    "hemisBirthDate": "Дата рождения",
+    "hemisAcademicRank": "Звание (HEMIS)",
+    "hemisStaffPosition": "Должность (HEMIS)",
+    "hemisEmploymentStatus": "Статус занятости",
+    "hemisDepartment": "Отдел (HEMIS)",
+    "hemisOAuthSynced": "Обновлено через вход HEMIS",
+    "hemisRestSynced": "Синхронизировано вручную",
+    "notSyncedYet": "Ещё не синхронизировано",
+    "syncNow": "Синхронизировать",
+    "syncing": "Синхронизация...",
+    "noHemisLink": "Этот сотрудник не связан с HEMIS",
+    "genericError": "Произошла ошибка"
   },
   "templates": {
     "heading": "Шаблоны KPI",
