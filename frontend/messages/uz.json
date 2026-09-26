@@ -804,31 +804,47 @@
   },
   "home": {
     "nav": {
-      "login": "Tizimga kirish"
+      "cta": "Kirish"
     },
     "hero": {
-      "eyebrow": "Xalqaro Innovatsion Universiteti",
-      "title": "Professor-o'qituvchilar faoliyatini dalil asosida, ochiq va adolatli baholash",
-      "subtitle": "Nizomga asoslangan ko'rsatkichlar, bosqichma-bosqich tasdiqlash va real vaqtdagi reyting — barchasi bitta tizimda.",
-      "cta": "Tizimga kirish",
-      "ctaSecondary": "Reytingni ko'rish"
+      "headline": "Professor-o'qituvchilar faoliyati endi dalil bilan baholanadi",
+      "subtext": "Xalqaro Innovatsion Universitetida har bir ariza Nizom asosidagi mezonlar bilan tekshiriladi, natija esa ochiq reytingda ko'rinadi.",
+      "ctaPrimary": "Kirish",
+      "ctaSecondary": "Reytingni ko'rish",
+      "previewLabel": "Joriy reyting",
+      "previewEmpty": "Hozircha natija yo'q"
     },
     "stats": {
-      "employees": "Ishtirokchilar",
-      "departments": "Fakultet va bo'limlar",
-      "averageScore": "O'rtacha ball",
-      "topScore": "Eng yuqori ball",
-      "period": "{year} o'quv yili"
+      "employees": "Ishtirokchi",
+      "departments": "Fakultet va bo'lim",
+      "average": "O'rtacha ball",
+      "top": "Eng yuqori ball"
+    },
+    "steps": {
+      "heading": "Baholash jarayoni",
+      "items": [
+        {
+          "title": "Dalil bilan ariza topshirish",
+          "body": "Xodim har bir ko'rsatkich bo'yicha hujjat, sertifikat yoki boshqa dalil biriktirib ariza topshiradi."
+        },
+        {
+          "title": "Bosqichma-bosqich tasdiqlash",
+          "body": "Ariza avval kafedra, so'ng tegishli bo'lim tomonidan Nizomdagi mezonlar asosida ko'rib chiqiladi."
+        },
+        {
+          "title": "Ball va reyting",
+          "body": "Tasdiqlangan ball avtomatik yig'iladi va umumiy reytingda real vaqtda aks etadi."
+        }
+      ]
     },
     "leaderboard": {
       "heading": "Yetakchilar reytingi",
-      "subtitle": "Joriy o'quv yili bo'yicha eng yuqori natijali xodimlar",
-      "empty": "Hozircha baholangan natijalar yo'q",
-      "of": "dan"
+      "subtext": "{year} o'quv yili bo'yicha eng yuqori natijali xodimlar",
+      "empty": "Hozircha baholangan natijalar yo'q"
     },
     "footer": {
-      "rights": "Barcha huquqlar himoyalangan",
-      "internal": "Ichki KPI baholash tizimi"
+      "tagline": "Ichki KPI baholash tizimi",
+      "rights": "Barcha huquqlar himoyalangan"
     }
   }
 }

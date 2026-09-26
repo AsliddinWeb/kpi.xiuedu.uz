@@ -804,31 +804,47 @@
   },
   "home": {
     "nav": {
-      "login": "Sign in"
+      "cta": "Sign in"
     },
     "hero": {
-      "eyebrow": "International Innovation University",
-      "title": "Evidence-based, transparent evaluation of academic staff performance",
-      "subtitle": "Nizom-based indicators, staged approval, and a real-time leaderboard — all in one system.",
-      "cta": "Sign in",
-      "ctaSecondary": "View leaderboard"
+      "headline": "Faculty performance, now evaluated with evidence",
+      "subtext": "At the International Innovation University, every submission is checked against Nizom-based criteria, and results appear on a public leaderboard.",
+      "ctaPrimary": "Sign in",
+      "ctaSecondary": "View leaderboard",
+      "previewLabel": "Current leaderboard",
+      "previewEmpty": "No results yet"
     },
     "stats": {
       "employees": "Participants",
-      "departments": "Faculties & departments",
-      "averageScore": "Average score",
-      "topScore": "Top score",
-      "period": "{year} academic year"
+      "departments": "Faculties and departments",
+      "average": "Average score",
+      "top": "Top score"
+    },
+    "steps": {
+      "heading": "How evaluation works",
+      "items": [
+        {
+          "title": "Submit with evidence",
+          "body": "Staff submit a request for each indicator, attaching a certificate, document, or other proof."
+        },
+        {
+          "title": "Reviewed in stages",
+          "body": "The request is reviewed first by the department, then by the relevant unit, against the Nizom criteria."
+        },
+        {
+          "title": "Score and ranking",
+          "body": "Approved points are added automatically and reflected on the overall leaderboard in real time."
+        }
+      ]
     },
     "leaderboard": {
       "heading": "Leaderboard",
-      "subtitle": "Top-performing staff for the current academic year",
-      "empty": "No scored results yet",
-      "of": "of"
+      "subtext": "Top-performing staff for the {year} academic year",
+      "empty": "No scored results yet"
     },
     "footer": {
-      "rights": "All rights reserved",
-      "internal": "Internal KPI evaluation system"
+      "tagline": "Internal KPI evaluation system",
+      "rights": "All rights reserved"
     }
   }
 }
