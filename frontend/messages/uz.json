@@ -329,7 +329,11 @@
     "allRoles": "Barcha rollar",
     "allStatuses": "Barcha holatlar",
     "clearFilters": "Filtrlarni tozalash",
-    "view": "Ko'rish"
+    "view": "Ko'rish",
+    "needsSetupCount": "Sozlash kerak",
+    "needsSetupBadge": "Yangi",
+    "needsSetupHint": "HEMIS orqali qo'shilgan, rol yoki tashkilot/baholash ma'lumotlari hali belgilanmagan",
+    "needsSetupFilter": "Sozlash kerak (HEMIS'dan yangi)"
   },
   "employeeDetail": {
     "heading": "Xodim tafsiloti",

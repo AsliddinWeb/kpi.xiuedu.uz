@@ -15,6 +15,7 @@ import {
   IconUpload,
   IconUser,
   IconUserCheck,
+  IconUserExclamation,
   IconUserOff,
   IconUsersGroup,
 } from "@tabler/icons-react";
@@ -49,6 +50,17 @@ const STATUS_TONE = {
   inactive: "bg-danger-soft text-danger",
   restricted: "bg-warning-soft text-warning",
 };
+
+// HEMIS auto-provisions new accounts with role="employee" and no department/
+// position/kpi_template - an admin still has to walk through "Tashkilot va
+// baholash" for each new arrival. Flag those so they don't get lost in a long
+// list.
+function needsSetup(emp: Employee): boolean {
+  return (
+    emp.auth_provider === "hemis" &&
+    (emp.role === "employee" || emp.department_id == null || emp.position_id == null || emp.kpi_template_id == null)
+  );
+}
 
 export default function EmployeesManager({
   initialEmployees,
@@ -103,6 +115,7 @@ export default function EmployeesManager({
       active: employees.filter((e) => e.is_active).length,
       restricted: employees.filter((e) => e.is_restricted).length,
       managers: employees.filter((e) => e.role === "manager").length,
+      needsSetup: employees.filter(needsSetup).length,
     }),
     [employees],
   );
@@ -141,6 +154,7 @@ export default function EmployeesManager({
       if (statusFilter === "active" && !e.is_active) return false;
       if (statusFilter === "inactive" && e.is_active) return false;
       if (statusFilter === "restricted" && !e.is_restricted) return false;
+      if (statusFilter === "needs_setup" && !needsSetup(e)) return false;
       return true;
     });
   }, [employees, search, departmentFilter, facultyDepartmentIds, roleFilter, statusFilter]);
@@ -243,11 +257,16 @@ export default function EmployeesManager({
         <p className="rounded-lg border border-danger-soft bg-danger-soft px-3 py-2.5 text-sm text-danger">{error}</p>
       )}
 
-      <div className="grid gap-3 sm:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <StatChip icon={IconUser} label={t("totalCount")} value={stats.total} tone="text-accent" />
         <StatChip icon={IconUserCheck} label={t("activeCount")} value={stats.active} tone="text-success" />
         <StatChip icon={IconBan} label={t("restrictedCount")} value={stats.restricted} tone="text-warning" />
         <StatChip icon={IconUsersGroup} label={t("managersCount")} value={stats.managers} tone="text-text-2" />
+        {stats.needsSetup > 0 && (
+          <button type="button" onClick={() => setStatusFilter("needs_setup")} className="text-left">
+            <StatChip icon={IconUserExclamation} label={t("needsSetupCount")} value={stats.needsSetup} tone="text-danger" />
+          </button>
+        )}
       </div>
 
       {employees.length > 0 && (
@@ -358,6 +377,7 @@ export default function EmployeesManager({
               <option value="active">{t("active")}</option>
               <option value="inactive">{t("inactive")}</option>
               <option value="restricted">{t("restricted")}</option>
+              <option value="needs_setup">{t("needsSetupFilter")}</option>
             </select>
           </IconField>
         </div>
@@ -487,8 +507,14 @@ export default function EmployeesManager({
                 const template = kpiTemplates.find((tpl) => tpl.id === emp.kpi_template_id);
                 const department = departments.find((d) => d.id === emp.department_id);
                 const position = department?.positions.find((p) => p.id === emp.position_id);
+                const flagged = needsSetup(emp);
                 return (
-                  <tr key={emp.id} className="border-b border-border transition-colors last:border-0 hover:bg-surface-alt/50">
+                  <tr
+                    key={emp.id}
+                    className={`border-b border-border transition-colors last:border-0 ${
+                      flagged ? "bg-danger-soft/40 hover:bg-danger-soft/60" : "hover:bg-surface-alt/50"
+                    }`}
+                  >
                     <td className="px-4 py-3">
                       <Link href={`/dashboard/employees/${emp.id}`} className="flex items-center gap-3 group/row">
                         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-xs font-bold text-accent">
@@ -497,13 +523,23 @@ export default function EmployeesManager({
                         <div className="min-w-0">
                           <p className="flex items-center gap-1.5 truncate text-sm font-semibold text-text-1 group-hover/row:text-accent">
                             <span className="truncate">{emp.full_name}</span>
-                            {emp.auth_provider === "hemis" && (
+                            {flagged ? (
                               <span
-                                title={t("hemisLinked")}
-                                className="shrink-0 rounded-full bg-accent-soft px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wide text-accent"
+                                title={t("needsSetupHint")}
+                                className="flex shrink-0 items-center gap-0.5 rounded-full bg-danger px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wide text-white"
                               >
-                                HEMIS
+                                <IconUserExclamation size={10} stroke={2.25} />
+                                {t("needsSetupBadge")}
                               </span>
+                            ) : (
+                              emp.auth_provider === "hemis" && (
+                                <span
+                                  title={t("hemisLinked")}
+                                  className="shrink-0 rounded-full bg-accent-soft px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wide text-accent"
+                                >
+                                  HEMIS
+                                </span>
+                              )
                             )}
                           </p>
                           <p className="truncate text-xs text-text-3">{emp.email}</p>

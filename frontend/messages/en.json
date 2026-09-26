@@ -329,7 +329,11 @@
     "allRoles": "All roles",
     "allStatuses": "All statuses",
     "clearFilters": "Clear filters",
-    "view": "View"
+    "view": "View",
+    "needsSetupCount": "Needs setup",
+    "needsSetupBadge": "New",
+    "needsSetupHint": "Provisioned via HEMIS - role or organization/evaluation fields not set yet",
+    "needsSetupFilter": "Needs setup (new from HEMIS)"
   },
   "employeeDetail": {
     "heading": "Employee detail",

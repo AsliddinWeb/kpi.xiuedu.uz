@@ -329,7 +329,11 @@
     "allRoles": "Все роли",
     "allStatuses": "Все статусы",
     "clearFilters": "Очистить фильтры",
-    "view": "Просмотр"
+    "view": "Просмотр",
+    "needsSetupCount": "Требует настройки",
+    "needsSetupBadge": "Новый",
+    "needsSetupHint": "Создан через HEMIS - роль или данные организации/оценки ещё не заданы",
+    "needsSetupFilter": "Требует настройки (новый из HEMIS)"
   },
   "employeeDetail": {
     "heading": "Данные сотрудника",
