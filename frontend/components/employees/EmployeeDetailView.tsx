@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  IconAlertTriangle,
   IconBriefcase,
   IconBuilding,
   IconCalendar,
@@ -13,12 +12,10 @@ import {
   IconFolderOpen,
   IconGauge,
   IconId,
-  IconLoader2,
   IconLogin2,
   IconMail,
   IconPencil,
   IconPhone,
-  IconRefresh,
   IconSchool,
   IconShieldCheck,
   IconStack3,
@@ -74,9 +71,7 @@ export default function EmployeeDetailView({
   const [rows, setRows] = useState(initialRows);
   const [loading, setLoading] = useState(false);
 
-  const [hemis, setHemis] = useState(employee);
-  const [syncing, setSyncing] = useState(false);
-  const [syncError, setSyncError] = useState<string | null>(null);
+  const hemis = employee;
 
   const canEdit = viewerRole === "super_admin" || viewerRole === "admin";
   const photoUrl = hemis.hemis_image_url || hemis.hemis_picture_url;
@@ -108,26 +103,6 @@ export default function EmployeeDetailView({
       if (res.ok) setRows(await res.json());
     } finally {
       setLoading(false);
-    }
-  }
-
-  async function handleSync() {
-    setSyncing(true);
-    setSyncError(null);
-    try {
-      const res = await fetch(`/api/v1/users/${employee.id}/hemis-sync`, {
-        method: "POST",
-        headers: { "Accept-Language": locale },
-        credentials: "include",
-      });
-      const body = await res.json().catch(() => null);
-      if (!res.ok) {
-        setSyncError(body?.detail ?? t("genericError"));
-        return;
-      }
-      setHemis(body);
-    } finally {
-      setSyncing(false);
     }
   }
 
@@ -192,30 +167,10 @@ export default function EmployeeDetailView({
 
       {hasHemisLink && (
         <div className="rounded-xl border border-border bg-surface p-5 shadow-soft">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <IconSchool size={16} stroke={1.75} className="text-text-3" />
-              <p className="text-sm font-semibold text-text-1">{t("hemisInfo")}</p>
-            </div>
-            {canEdit && (
-              <button
-                type="button"
-                onClick={handleSync}
-                disabled={syncing}
-                className="flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-text-1 transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
-              >
-                {syncing ? <IconLoader2 size={13} className="animate-spin" /> : <IconRefresh size={13} stroke={2} />}
-                {syncing ? t("syncing") : t("syncNow")}
-              </button>
-            )}
+          <div className="flex items-center gap-2">
+            <IconSchool size={16} stroke={1.75} className="text-text-3" />
+            <p className="text-sm font-semibold text-text-1">{t("hemisInfo")}</p>
           </div>
-
-          {syncError && (
-            <p className="mt-3 flex items-center gap-2 rounded-lg border border-danger-soft bg-danger-soft px-3 py-2.5 text-sm text-danger">
-              <IconAlertTriangle size={16} stroke={1.75} className="shrink-0" />
-              {syncError}
-            </p>
-          )}
 
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {hemis.hemis_login && <InfoItem icon={IconId} label={t("hemisLogin")} value={hemis.hemis_login} />}
@@ -243,11 +198,6 @@ export default function EmployeeDetailView({
               <IconClockHour4 size={12} stroke={1.75} />
               {t("hemisOAuthSynced")}:{" "}
               {hemis.hemis_last_synced_at ? <TimeAgo iso={hemis.hemis_last_synced_at} locale={locale} /> : t("never")}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <IconRefresh size={12} stroke={1.75} />
-              {t("hemisRestSynced")}:{" "}
-              {hemis.hemis_rest_synced_at ? <TimeAgo iso={hemis.hemis_rest_synced_at} locale={locale} /> : t("notSyncedYet")}
             </span>
           </div>
         </div>
