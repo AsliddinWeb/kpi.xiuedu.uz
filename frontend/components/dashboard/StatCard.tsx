@@ -33,7 +33,7 @@ const TONE_WASH_CLASSES: Record<Tone, string> = {
 
 type Props = {
   title: string;
-  value: string;
+  value: React.ReactNode;
   hint?: string;
   icon?: Icon;
   tone?: Tone;

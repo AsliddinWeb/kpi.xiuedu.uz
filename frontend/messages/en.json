@@ -189,7 +189,11 @@
       "departments": "Departments",
       "positions": "Positions",
       "templates": "KPI templates"
-    }
+    },
+    "coverImage": "Homepage cover photo",
+    "coverHint": "PNG, JPEG, or WEBP, up to 8 MB - shown as the public homepage background",
+    "coverInvalidType": "Only PNG, JPEG, or WEBP image files can be uploaded",
+    "coverTooLarge": "Image size must not exceed 8 MB"
   },
   "structure": {
     "heading": "Organization structure",
@@ -825,10 +829,11 @@
       }
     },
     "stats": {
-      "employees": "Participants",
-      "departments": "Faculties and departments",
-      "average": "Average score",
-      "top": "Top score"
+      "heading": "System overview",
+      "new": "New submissions",
+      "inReview": "Under review",
+      "approved": "Approved",
+      "rejected": "Rejected"
     },
     "steps": {
       "heading": "How evaluation works",
@@ -850,7 +855,9 @@
     "leaderboard": {
       "heading": "Leaderboard",
       "subtext": "Top-performing staff for the {year} academic year",
-      "empty": "No scored results yet"
+      "empty": "No scored results yet",
+      "fullName": "Full name",
+      "score": "Score"
     },
     "footer": {
       "tagline": "Internal KPI evaluation system",

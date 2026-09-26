@@ -14,3 +14,7 @@ class PublicStats(BaseModel):
     average_score: float | None
     top_score: float | None
     academic_year: str | None
+    arizalar_new: int
+    arizalar_in_review: int
+    arizalar_approved: int
+    arizalar_rejected: int

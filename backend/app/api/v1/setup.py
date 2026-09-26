@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, require_role
+from app.api.deps import require_role
 from app.core.i18n import get_locale, t
 from app.core.security import hash_password
 from app.db.session import get_db
@@ -27,6 +27,8 @@ from app.services.audit import log_action
 router = APIRouter(prefix="/setup", tags=["setup"])
 
 LOGO_DIR = Path("/data/company-logo")
+# Shares the same volume as the logo (no separate volume/mount needed) - just a subdirectory.
+COVER_DIR = Path("/data/company-logo/cover")
 LOGO_CONTENT_TYPES = {
     "image/png": "png",
     "image/jpeg": "jpg",
@@ -34,6 +36,7 @@ LOGO_CONTENT_TYPES = {
     "image/svg+xml": "svg",
 }
 MAX_LOGO_SIZE = 5 * 1024 * 1024
+MAX_COVER_SIZE = 8 * 1024 * 1024
 
 
 @router.get("/status", response_model=SetupStatus)
@@ -92,10 +95,10 @@ def complete_setup(
 
 
 @router.get("/company", response_model=CompanySettingsOut)
-def get_company(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-) -> CompanySettingsOut:
+def get_company(db: Session = Depends(get_db)) -> CompanySettingsOut:
+    """Public on purpose: only branding metadata (name/logo/cover photo/period
+    type), no auth required. The login page and the public homepage both need
+    to render this before a visitor has any session."""
     company = db.scalar(select(CompanySettings))
     if company is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -127,22 +130,47 @@ def update_company(
     return CompanySettingsOut.model_validate(company)
 
 
-async def _write_logo_file(file: UploadFile, locale: str) -> str:
-    """Validates and writes the uploaded logo to LOGO_DIR, returning the URL to serve it from."""
+async def _write_image_file(
+    file: UploadFile, locale: str, *, directory: Path, stem: str, max_size: int, serve_path: str
+) -> str:
+    """Validates and writes an uploaded image to `directory/{stem}.{ext}`, returning the
+    URL to serve it from. Shared by the logo and the public-homepage cover image."""
     extension = LOGO_CONTENT_TYPES.get(file.content_type or "")
     if extension is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=t("logo_invalid_type", locale))
 
     data = await file.read()
-    if len(data) > MAX_LOGO_SIZE:
+    if len(data) > max_size:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=t("logo_too_large", locale))
 
-    LOGO_DIR.mkdir(parents=True, exist_ok=True)
-    for stale in LOGO_DIR.glob("logo.*"):
+    directory.mkdir(parents=True, exist_ok=True)
+    for stale in directory.glob(f"{stem}.*"):
         stale.unlink(missing_ok=True)
-    (LOGO_DIR / f"logo.{extension}").write_bytes(data)
+    (directory / f"{stem}.{extension}").write_bytes(data)
 
-    return f"/api/v1/setup/company/logo-file?v={int(datetime.now(timezone.utc).timestamp())}"
+    return f"{serve_path}?v={int(datetime.now(timezone.utc).timestamp())}"
+
+
+async def _write_logo_file(file: UploadFile, locale: str) -> str:
+    return await _write_image_file(
+        file,
+        locale,
+        directory=LOGO_DIR,
+        stem="logo",
+        max_size=MAX_LOGO_SIZE,
+        serve_path="/api/v1/setup/company/logo-file",
+    )
+
+
+async def _write_cover_file(file: UploadFile, locale: str) -> str:
+    return await _write_image_file(
+        file,
+        locale,
+        directory=COVER_DIR,
+        stem="cover",
+        max_size=MAX_COVER_SIZE,
+        serve_path="/api/v1/setup/company/cover-file",
+    )
 
 
 @router.post("/logo", response_model=LogoUploadResponse)
@@ -205,6 +233,57 @@ def remove_company_logo(
 def get_company_logo_file(request: Request) -> FileResponse:
     locale = get_locale(request)
     matches = sorted(LOGO_DIR.glob("logo.*")) if LOGO_DIR.exists() else []
+    if not matches:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=t("logo_not_found", locale))
+    return FileResponse(matches[0])
+
+
+@router.post("/company/cover-image", response_model=CompanySettingsOut)
+async def upload_company_cover_image(
+    request: Request,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("super_admin", "admin")),
+) -> CompanySettingsOut:
+    """The public homepage's hero background photo (e.g. a photo of the campus
+    building) - separate from the logo, set from the Settings page."""
+    locale = get_locale(request)
+    company = db.scalar(select(CompanySettings))
+    if company is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    company.cover_image_url = await _write_cover_file(file, locale)
+
+    log_action(db, current_user.id, "update", "company_settings", company.id)
+    db.commit()
+    db.refresh(company)
+    return CompanySettingsOut.model_validate(company)
+
+
+@router.delete("/company/cover-image", response_model=CompanySettingsOut)
+def remove_company_cover_image(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("super_admin", "admin")),
+) -> CompanySettingsOut:
+    company = db.scalar(select(CompanySettings))
+    if company is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    if COVER_DIR.exists():
+        for stale in COVER_DIR.glob("cover.*"):
+            stale.unlink(missing_ok=True)
+    company.cover_image_url = None
+
+    log_action(db, current_user.id, "update", "company_settings", company.id)
+    db.commit()
+    db.refresh(company)
+    return CompanySettingsOut.model_validate(company)
+
+
+@router.get("/company/cover-file")
+def get_company_cover_file(request: Request) -> FileResponse:
+    locale = get_locale(request)
+    matches = sorted(COVER_DIR.glob("cover.*")) if COVER_DIR.exists() else []
     if not matches:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=t("logo_not_found", locale))
     return FileResponse(matches[0])

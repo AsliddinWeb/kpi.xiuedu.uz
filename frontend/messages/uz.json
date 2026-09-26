@@ -189,7 +189,11 @@
       "departments": "Bo'limlar",
       "positions": "Lavozimlar",
       "templates": "KPI shablonlari"
-    }
+    },
+    "coverImage": "Bosh sahifa surati",
+    "coverHint": "PNG, JPEG yoki WEBP, 8 MB gacha — bosh sahifa fonida ko'rinadi",
+    "coverInvalidType": "Faqat PNG, JPEG yoki WEBP formatidagi rasm yuklash mumkin",
+    "coverTooLarge": "Rasm hajmi 8 MB dan oshmasligi kerak"
   },
   "structure": {
     "heading": "Tashkilot tuzilmasi",
@@ -825,10 +829,11 @@
       }
     },
     "stats": {
-      "employees": "Ishtirokchi",
-      "departments": "Fakultet va bo'lim",
-      "average": "O'rtacha ball",
-      "top": "Eng yuqori ball"
+      "heading": "Tizim statistikasi",
+      "new": "Yangi arizalar",
+      "inReview": "Tekshirilmoqda",
+      "approved": "Tasdiqlangan",
+      "rejected": "Bekor qilingan"
     },
     "steps": {
       "heading": "Baholash jarayoni",
@@ -850,7 +855,9 @@
     "leaderboard": {
       "heading": "Yetakchilar reytingi",
       "subtext": "{year} o'quv yili bo'yicha eng yuqori natijali xodimlar",
-      "empty": "Hozircha baholangan natijalar yo'q"
+      "empty": "Hozircha baholangan natijalar yo'q",
+      "fullName": "F.I.Sh.",
+      "score": "Ball"
     },
     "footer": {
       "tagline": "Ichki KPI baholash tizimi",

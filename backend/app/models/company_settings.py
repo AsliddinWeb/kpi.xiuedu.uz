@@ -21,6 +21,7 @@ class CompanySettings(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     logo_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    cover_image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     industry_label: Mapped[str | None] = mapped_column(String(255), nullable=True)
     default_period_type: Mapped[PeriodType] = mapped_column(SAEnum(PeriodType, name="period_type"), nullable=False)
     setup_completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

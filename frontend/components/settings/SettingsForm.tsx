@@ -31,6 +31,8 @@ const PERIOD_OPTIONS: { value: PeriodType; icon: typeof IconCalendarMonth }[] = 
 
 const ACCEPTED_LOGO_TYPES = ["image/png", "image/jpeg", "image/webp", "image/svg+xml"];
 const MAX_LOGO_BYTES = 5 * 1024 * 1024;
+const ACCEPTED_COVER_TYPES = ["image/png", "image/jpeg", "image/webp"];
+const MAX_COVER_BYTES = 8 * 1024 * 1024;
 
 export default function SettingsForm({ company }: { company: CompanySettings }) {
   const router = useRouter();
@@ -49,6 +51,12 @@ export default function SettingsForm({ company }: { company: CompanySettings }) 
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [logoError, setLogoError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [coverImageUrl, setCoverImageUrl] = useState(company.cover_image_url ?? "");
+  const [coverBroken, setCoverBroken] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [coverError, setCoverError] = useState<string | null>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -138,8 +146,70 @@ export default function SettingsForm({ company }: { company: CompanySettings }) 
     }
   }
 
+  async function handleCoverFile(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    setCoverError(null);
+    if (!ACCEPTED_COVER_TYPES.includes(file.type)) {
+      setCoverError(t("coverInvalidType"));
+      return;
+    }
+    if (file.size > MAX_COVER_BYTES) {
+      setCoverError(t("coverTooLarge"));
+      return;
+    }
+
+    setUploadingCover(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/v1/setup/company/cover-image", {
+        method: "POST",
+        headers: { "Accept-Language": locale },
+        credentials: "include",
+        body: formData,
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        setCoverError(body?.detail ?? t("genericError"));
+        return;
+      }
+      const updated = await res.json();
+      setCoverImageUrl(updated.cover_image_url ?? "");
+      setCoverBroken(false);
+      router.refresh();
+    } finally {
+      setUploadingCover(false);
+    }
+  }
+
+  async function handleRemoveCover() {
+    setCoverError(null);
+    setUploadingCover(true);
+    try {
+      const res = await fetch("/api/v1/setup/company/cover-image", {
+        method: "DELETE",
+        headers: { "Accept-Language": locale },
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        setCoverError(body?.detail ?? t("genericError"));
+        return;
+      }
+      setCoverImageUrl("");
+      setCoverBroken(false);
+      router.refresh();
+    } finally {
+      setUploadingCover(false);
+    }
+  }
+
   const initial = name.trim() ? name.trim().charAt(0).toUpperCase() : null;
   const showLogo = Boolean(logoUrl) && !logoBroken;
+  const showCover = Boolean(coverImageUrl) && !coverBroken;
 
   return (
     <div className="grid gap-5 lg:grid-cols-[1fr_300px] lg:items-start">
@@ -214,6 +284,64 @@ export default function SettingsForm({ company }: { company: CompanySettings }) 
                   type="file"
                   accept={ACCEPTED_LOGO_TYPES.join(",")}
                   onChange={handleLogoFile}
+                  className="hidden"
+                />
+              </div>
+            </Field>
+
+            <Field label={t("coverImage")} htmlFor="cover-upload">
+              <div className="space-y-2">
+                <div className="relative flex h-28 w-full items-center justify-center overflow-hidden rounded-xl border border-border bg-bg sm:w-56">
+                  {uploadingCover ? (
+                    <IconLoader2 size={20} className="animate-spin text-text-3" />
+                  ) : showCover ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={coverImageUrl}
+                      alt={t("coverImage")}
+                      className="h-full w-full object-cover"
+                      onError={() => setCoverBroken(true)}
+                      onLoad={() => setCoverBroken(false)}
+                    />
+                  ) : (
+                    <IconPhotoUp size={22} stroke={1.5} className="text-text-3" />
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => coverInputRef.current?.click()}
+                    disabled={uploadingCover}
+                    className="flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-text-1 transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
+                  >
+                    <IconUpload size={14} stroke={2} />
+                    {showCover ? t("logoReplace") : t("logoUpload")}
+                  </button>
+                  {showCover && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveCover}
+                      disabled={uploadingCover}
+                      className="flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-danger transition-colors hover:border-danger disabled:opacity-50"
+                    >
+                      <IconTrash size={14} stroke={2} />
+                      {t("logoRemove")}
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-text-3">{t("coverHint")}</p>
+                {coverError && (
+                  <p className="flex items-center gap-1.5 text-xs text-danger">
+                    <IconAlertTriangle size={12} stroke={1.75} />
+                    {coverError}
+                  </p>
+                )}
+                <input
+                  ref={coverInputRef}
+                  id="cover-upload"
+                  type="file"
+                  accept={ACCEPTED_COVER_TYPES.join(",")}
+                  onChange={handleCoverFile}
                   className="hidden"
                 />
               </div>

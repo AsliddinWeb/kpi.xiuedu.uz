@@ -4,12 +4,15 @@ from sqlalchemy.orm import Session
 
 from app.core.rate_limit import limiter
 from app.db.session import get_db
+from app.models.ariza import Ariza, ArizaStatus
 from app.models.department import Department
 from app.models.kpi_category import KpiCategory
 from app.models.kpi_result import KpiResult
 from app.models.kpi_template import KpiTemplate
 from app.models.user import User
 from app.schemas.public import PublicLeaderboardRow, PublicStats
+
+IN_REVIEW_STATUSES = (ArizaStatus.kafedra_endorsed, ArizaStatus.scored, ArizaStatus.pending_head_approval)
 
 router = APIRouter(prefix="/public", tags=["public"])
 
@@ -68,13 +71,35 @@ def public_leaderboard(request: Request, db: Session = Depends(get_db)) -> list[
     return rows[:TOP_N]
 
 
+def _ariza_status_counts(db: Session) -> dict[str, int]:
+    rows = db.execute(select(Ariza.status, func.count(Ariza.id)).group_by(Ariza.status)).all()
+    counts = {status: 0 for status in ArizaStatus}
+    for status, count in rows:
+        counts[status] = count
+    return {
+        "new": counts[ArizaStatus.submitted],
+        "in_review": sum(counts[s] for s in IN_REVIEW_STATUSES),
+        "approved": counts[ArizaStatus.approved],
+        "rejected": counts[ArizaStatus.rejected],
+    }
+
+
 @router.get("/stats", response_model=PublicStats)
 @limiter.limit("30/minute")
 def public_stats(request: Request, db: Session = Depends(get_db)) -> PublicStats:
+    ariza_counts = _ariza_status_counts(db)
     template = _active_template(db)
     if template is None:
         return PublicStats(
-            total_employees=0, total_departments=0, average_score=None, top_score=None, academic_year=None
+            total_employees=0,
+            total_departments=0,
+            average_score=None,
+            top_score=None,
+            academic_year=None,
+            arizalar_new=ariza_counts["new"],
+            arizalar_in_review=ariza_counts["in_review"],
+            arizalar_approved=ariza_counts["approved"],
+            arizalar_rejected=ariza_counts["rejected"],
         )
 
     total_employees = db.scalar(select(func.count(User.id)).where(User.kpi_template_id == template.id)) or 0
@@ -94,4 +119,8 @@ def public_stats(request: Request, db: Session = Depends(get_db)) -> PublicStats
         average_score=average_score,
         top_score=top_score,
         academic_year=template.academic_year,
+        arizalar_new=ariza_counts["new"],
+        arizalar_in_review=ariza_counts["in_review"],
+        arizalar_approved=ariza_counts["approved"],
+        arizalar_rejected=ariza_counts["rejected"],
     )

@@ -19,6 +19,7 @@ class CompanySettingsOut(BaseModel):
     id: int
     name: str
     logo_url: str | None
+    cover_image_url: str | None
     industry_label: str | None
     default_period_type: PeriodType
     setup_completed_at: datetime | None

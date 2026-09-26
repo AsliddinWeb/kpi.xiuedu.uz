@@ -5,6 +5,7 @@ export type CompanySettings = {
   id: number;
   name: string;
   logo_url: string | null;
+  cover_image_url: string | null;
   industry_label: string | null;
   default_period_type: "monthly" | "quarterly" | "yearly";
   setup_completed_at: string | null;

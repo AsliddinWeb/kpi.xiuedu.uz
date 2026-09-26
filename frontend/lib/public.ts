@@ -13,6 +13,10 @@ export type PublicStats = {
   average_score: number | null;
   top_score: number | null;
   academic_year: string | null;
+  arizalar_new: number;
+  arizalar_in_review: number;
+  arizalar_approved: number;
+  arizalar_rejected: number;
 };
 
 function internalUrl() {

@@ -100,6 +100,36 @@ def test_public_stats_no_auth(client, seed_users, seed_departments, seed_kpi_tem
     assert body["academic_year"] == seed_kpi_template["template"].academic_year
 
 
+def test_public_stats_ariza_status_buckets(client, db_session, seed_users, seed_employee_with_position, seed_kpi_template):
+    from app.models.ariza import Ariza, ArizaStatus
+
+    employee = seed_employee_with_position
+    indicator_id = seed_kpi_template["quality"].id
+    period = seed_kpi_template["template"].academic_year
+
+    statuses = [
+        ArizaStatus.submitted,
+        ArizaStatus.kafedra_endorsed,
+        ArizaStatus.scored,
+        ArizaStatus.pending_head_approval,
+        ArizaStatus.approved,
+        ArizaStatus.approved,
+        ArizaStatus.rejected,
+    ]
+    for st in statuses:
+        db_session.add(Ariza(user_id=employee.id, kpi_indicator_id=indicator_id, period=period, status=st))
+    db_session.commit()
+
+    client.cookies.clear()
+    resp = client.get("/api/v1/public/stats")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["arizalar_new"] == 1
+    assert body["arizalar_in_review"] == 3  # kafedra_endorsed + scored + pending_head_approval
+    assert body["arizalar_approved"] == 2
+    assert body["arizalar_rejected"] == 1
+
+
 def test_public_stats_with_no_active_template(client):
     client.cookies.clear()
     resp = client.get("/api/v1/public/stats")
