@@ -811,8 +811,12 @@
       "subtext": "At the International Innovation University, every submission is checked against Nizom-based criteria, and results appear on a public leaderboard.",
       "ctaPrimary": "Sign in",
       "ctaSecondary": "View leaderboard",
-      "previewLabel": "Current leaderboard",
-      "previewEmpty": "No results yet"
+      "visual": {
+        "primaryTitle": "Backed by evidence",
+        "primaryBody": "Every submission is supported by a document or certificate",
+        "badgeRanking": "Public leaderboard",
+        "badgeNizom": "Nizom-based"
+      }
     },
     "stats": {
       "employees": "Participants",

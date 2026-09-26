@@ -1,4 +1,11 @@
-import { IconArrowRight, IconChartBar, IconFileUpload, IconShieldCheck } from "@tabler/icons-react";
+import {
+  IconArrowRight,
+  IconCertificate,
+  IconChartBar,
+  IconFileUpload,
+  IconShieldCheck,
+  IconTrophy,
+} from "@tabler/icons-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import AnimatedNumber from "@/components/home/AnimatedNumber";
@@ -28,7 +35,6 @@ export default async function PublicHome({
   const brandInitial = brandName.charAt(0).toUpperCase();
   const year = new Date().getFullYear();
   const steps = t.raw("steps.items") as StepItem[];
-  const topThree = leaderboard.slice(0, 3);
 
   return (
     <div className="min-h-screen bg-bg">
@@ -98,57 +104,27 @@ export default async function PublicHome({
           </div>
 
           <div className="animate-fade-up" style={{ animationDelay: "100ms" }}>
-            <div className="relative">
-              {/* Stacked ghost cards behind the live preview - hints that this is a
-                  slice of a longer, real ranking (the full list is below the fold). */}
-              <div
-                aria-hidden
-                className="absolute inset-x-3 -top-3 h-full rounded-2xl border border-border bg-surface/70 opacity-60"
-                style={{ transform: "rotate(-1.5deg)" }}
-              />
-              <div
-                aria-hidden
-                className="absolute inset-x-1.5 -top-1.5 h-full rounded-2xl border border-border bg-surface/85 opacity-80"
-                style={{ transform: "rotate(0.8deg)" }}
-              />
-
-              <div className="relative rounded-2xl border border-border bg-surface p-5 shadow-lg">
-                <div className="flex items-center gap-1.5">
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75 motion-reduce:hidden" />
-                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
-                  </span>
-                  <p className="text-xs font-medium text-text-3">{t("hero.previewLabel")}</p>
+            <div className="relative mx-auto aspect-square w-full max-w-[22rem]">
+              <div className="absolute inset-8 flex flex-col items-center justify-center rounded-[2rem] border border-border bg-gradient-to-br from-accent-soft to-surface p-8 text-center shadow-lg sm:inset-10">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-accent text-white shadow-[0_10px_24px_-6px_rgba(76,95,238,0.55)]">
+                  <IconCertificate size={30} stroke={1.6} />
                 </div>
+                <p className="mt-5 text-base font-semibold text-text-1">{t("hero.visual.primaryTitle")}</p>
+                <p className="mt-1.5 text-sm leading-relaxed text-text-2">{t("hero.visual.primaryBody")}</p>
+              </div>
 
-                {topThree.length === 0 ? (
-                  <p className="mt-6 py-4 text-center text-sm text-text-3">{t("hero.previewEmpty")}</p>
-                ) : (
-                  <div className="mt-4 space-y-1">
-                    {topThree.map((row, i) => (
-                      <div
-                        key={`${row.full_name}-${i}`}
-                        className="animate-slide-in flex items-center gap-3 rounded-lg px-1 py-2.5 transition-colors hover:bg-surface-alt"
-                        style={{ animationDelay: `${220 + i * 90}ms` }}
-                      >
-                        <span className="relative flex h-7 w-7 shrink-0 items-center justify-center">
-                          {i === 0 && <span aria-hidden className="animate-pulse-ring absolute inset-0 rounded-full" />}
-                          <span
-                            className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
-                              i === 0 ? "bg-accent text-white" : "bg-accent-soft text-accent"
-                            }`}
-                          >
-                            {i + 1}
-                          </span>
-                        </span>
-                        <span className="min-w-0 flex-1 truncate text-sm font-medium text-text-1">{row.full_name}</span>
-                        <span className="shrink-0 text-sm font-bold tabular-nums text-text-1">
-                          <AnimatedNumber value={row.total_score} durationMs={900} />
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+              <div className="animate-float-a absolute -right-1 top-4 flex items-center gap-2.5 rounded-2xl border border-border bg-surface px-4 py-3 shadow-lg sm:right-0">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-warning-soft text-warning">
+                  <IconTrophy size={18} stroke={1.75} />
+                </div>
+                <span className="whitespace-nowrap text-sm font-semibold text-text-1">{t("hero.visual.badgeRanking")}</span>
+              </div>
+
+              <div className="animate-float-b absolute -left-1 bottom-8 flex items-center gap-2.5 rounded-2xl border border-border bg-surface px-4 py-3 shadow-lg sm:left-0">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-success-soft text-success">
+                  <IconShieldCheck size={18} stroke={1.75} />
+                </div>
+                <span className="whitespace-nowrap text-sm font-semibold text-text-1">{t("hero.visual.badgeNizom")}</span>
               </div>
             </div>
           </div>

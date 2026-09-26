@@ -811,8 +811,12 @@
       "subtext": "Xalqaro Innovatsion Universitetida har bir ariza Nizom asosidagi mezonlar bilan tekshiriladi, natija esa ochiq reytingda ko'rinadi.",
       "ctaPrimary": "Kirish",
       "ctaSecondary": "Reytingni ko'rish",
-      "previewLabel": "Joriy reyting",
-      "previewEmpty": "Hozircha natija yo'q"
+      "visual": {
+        "primaryTitle": "Dalil bilan tasdiqlangan",
+        "primaryBody": "Har bir ariza hujjat yoki sertifikat bilan asoslanadi",
+        "badgeRanking": "Ochiq reyting",
+        "badgeNizom": "Nizom asosida"
+      }
     },
     "stats": {
       "employees": "Ishtirokchi",
