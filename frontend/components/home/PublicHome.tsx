@@ -29,17 +29,21 @@ export default async function PublicHome({
   company,
   stats,
   leaderboard,
+  authenticated,
 }: {
   theme: Theme;
   company: CompanySettings | null;
   stats: PublicStats | null;
   leaderboard: PublicLeaderboardRow[];
+  authenticated: boolean;
 }) {
   const t = await getTranslations("home");
   const brandName = company?.name ?? "XIU KPI";
   const brandInitial = brandName.charAt(0).toUpperCase();
   const year = new Date().getFullYear();
   const steps = t.raw("steps.items") as StepItem[];
+  const primaryHref = authenticated ? "/dashboard" : "/login";
+  const primaryLabel = authenticated ? t("nav.dashboardCta") : t("nav.cta");
 
   return (
     <div className="min-h-screen bg-bg">
@@ -62,14 +66,14 @@ export default async function PublicHome({
         <div className="flex shrink-0 items-center gap-2">
           <TopRightControls
             theme={theme}
-            authenticated={false}
+            authenticated={authenticated}
             className="flex items-center gap-1 rounded-lg border border-border bg-surface p-1"
           />
           <Link
-            href="/login"
+            href={primaryHref}
             className="flex items-center rounded-lg bg-accent px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#3646c9] sm:px-4"
           >
-            {t("nav.cta")}
+            {primaryLabel}
           </Link>
         </div>
       </header>
@@ -92,10 +96,10 @@ export default async function PublicHome({
             </p>
             <div className="animate-fade-up mt-7 flex flex-wrap items-center justify-center gap-3" style={{ animationDelay: "140ms" }}>
               <Link
-                href="/login"
+                href={primaryHref}
                 className="group flex items-center gap-1.5 rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-[#3646c9]"
               >
-                {t("hero.ctaPrimary")}
+                {primaryLabel}
                 <IconArrowRight size={16} stroke={2} className="transition-transform duration-200 group-hover:translate-x-0.5" />
               </Link>
               <a
@@ -127,10 +131,10 @@ export default async function PublicHome({
               </p>
               <div className="animate-fade-up mt-8 flex flex-wrap items-center gap-3" style={{ animationDelay: "140ms" }}>
                 <Link
-                  href="/login"
+                  href={primaryHref}
                   className="group flex items-center gap-1.5 rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_14px_-2px_rgba(76,95,238,0.45)] transition-all hover:-translate-y-0.5 hover:bg-[#3646c9] hover:shadow-lg"
                 >
-                  {t("hero.ctaPrimary")}
+                  {primaryLabel}
                   <IconArrowRight size={16} stroke={2} className="transition-transform duration-200 group-hover:translate-x-0.5" />
                 </Link>
                 <a

@@ -837,7 +837,8 @@
   },
   "home": {
     "nav": {
-      "cta": "Sign in"
+      "cta": "Sign in",
+      "dashboardCta": "Go to dashboard"
     },
     "hero": {
       "headline": "Faculty performance, now evaluated with evidence",

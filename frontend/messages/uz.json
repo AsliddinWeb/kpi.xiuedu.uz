@@ -837,7 +837,8 @@
   },
   "home": {
     "nav": {
-      "cta": "Kirish"
+      "cta": "Kirish",
+      "dashboardCta": "Kabinetga o'tish"
     },
     "hero": {
       "headline": "Professor-o'qituvchilar faoliyati endi dalil bilan baholanadi",
